@@ -3,3 +3,8 @@ extends layout
 block content
   h1= title
   p Welcome to #{title}
+  form#formAddUser(name="rc", method="post",action="/rc")
+      div.userinput
+          div.textBoxDiv
+              input(type="text", placeholder="Enter your Steam username", name="username" class="textbox")
+              button(type="submit" class="btn") search
