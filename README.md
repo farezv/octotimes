@@ -1,4 +1,4 @@
-octotimes
+SteamRC
 =========
 
-Another super secret project that consumes the GitHub api
+Super secret project that consumes the Steam api
