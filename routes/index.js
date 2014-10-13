@@ -1,5 +1,8 @@
 var express = require('express');
 var router = express.Router();
+var apimeta = require('../apimeta');
+var steamApi = require('steam-webapi');
+steamApi.key = apimeta.key;
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -20,11 +23,11 @@ router.post('/rc', function(req, res) {
        // If found, redirect
 
        // Otherwise, make api call
-
+        
        // Store it in cache
 
        // Redirect
-       res.redirect(req.body.username.toString());
+       res.redirect('http://steamcommunity.com/id/' + req.body.username.toString());
    }
 });
 
