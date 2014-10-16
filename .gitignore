@@ -33,4 +33,4 @@ node_modules
 
 *.iml
 
-apimeta.js
+apimeta.json
