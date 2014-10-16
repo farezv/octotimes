@@ -1,8 +1,10 @@
 var express = require('express');
 var router = express.Router();
+var request = require('request');
 var apimeta = require('../apimeta');
 var SteamApi = require('steam-webapi');
 var User = require('../public/javascripts/user');
+var steamUser;
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -11,7 +13,8 @@ router.get('/', function(req, res) {
 
 /* GET user page. */
 router.get('/:username?', function(req, res) {
-    res.render('user', { user: req.params.username });
+    console.log(steamUser);
+    res.render('user', { user: steamUser });
 });
 
 router.post('/rc', function(req, res) {
@@ -32,7 +35,7 @@ router.post('/rc', function(req, res) {
                if (err) {
                    console.log(err);
                } else {
-                   var json = getPlayerProfile(result.steamid);
+                   getPlayerProfile(result.steamid, res);
                }
            });
 
@@ -41,12 +44,28 @@ router.post('/rc', function(req, res) {
        // Store it in cache
 
        // Redirect
-       res.redirect('user/' + req.body.username.toString());
+//       res.redirect('user/' + req.body.username.toString());
    }
 });
 
-function getPlayerProfile(steamId) {
-    
+function getPlayerProfile(steamId, res) {
+    var searchUrl = apimeta.getPlayerSummary + steamId;
+    request({
+        url: searchUrl,
+        headers: {
+            'User-Agent': 'farezv-steamrc'
+        }
+    }, function(error, reqResponse, body) {
+        if(!error && reqResponse.statusCode == 200) {
+            var bodyJson = [];
+            bodyJson = JSON.parse(body);
+            var apiResponse = bodyJson.response;
+            var userJson = apiResponse.players[0];
+//            console.log(userJson);
+            steamUser = new User(userJson.steamid, userJson.personaname, userJson.realname, userJson.profileurl, userJson.avatarfull);
+            res.redirect(steamUser.personaName);
+        }
+    });
 }
 
 module.exports = router;
