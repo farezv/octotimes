@@ -4,5 +4,9 @@
 extends layout
 
 block content
-    h1= Steam Report Card for
-    h2= user
+    h1 Steam Report Card
+    h2 #{user.realName} aka #{user.personaName}
+    p
+        #[img.avatar(src='#{user.avatar}')]
+    p
+        #[a.link(href='#{user.profileUrl}') #{user.profileUrl}]
