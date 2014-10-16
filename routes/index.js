@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var apimeta = require('../apimeta');
-var steamApi = require('steam-webapi');
-steamApi.key = apimeta.key;
+var SteamApi = require('steam-webapi');
+var User = require('../public/javascripts/user');
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -22,13 +22,31 @@ router.post('/rc', function(req, res) {
 
        // If found, redirect
 
-       // Otherwise, make api call
-        
+       // Otherwise, make api calls
+       SteamApi.key = apimeta.key;
+       var user;
+       SteamApi.ready(function(err) {
+           if (err) return console.log(err);
+           var steam = new SteamApi();
+           steam.resolveVanityURL({vanityurl:req.body.username}, function(err, result) {
+               if (err) {
+                   console.log(err);
+               } else {
+                   var json = getPlayerProfile(result.steamid);
+               }
+           });
+
+       });
+
        // Store it in cache
 
        // Redirect
-       res.redirect('http://steamcommunity.com/id/' + req.body.username.toString());
+       res.redirect('user/' + req.body.username.toString());
    }
 });
+
+function getPlayerProfile(steamId) {
+    
+}
 
 module.exports = router;
