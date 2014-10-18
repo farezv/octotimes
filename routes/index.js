@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var request = require('request');
-var apimeta = require('../apimeta');
+var apimeta = require('../api');
 var SteamApi = require('steam-webapi');
 var User = require('../public/javascripts/user');
 var steamUser;
@@ -26,7 +26,7 @@ router.post('/rc', function(req, res) {
        // If found, redirect
 
        // Otherwise, make api calls
-       SteamApi.key = apimeta.key;
+       SteamApi.key = api.key;
        var user;
        SteamApi.ready(function(err) {
            if (err) return console.log(err);
