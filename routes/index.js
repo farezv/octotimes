@@ -26,7 +26,7 @@ router.post('/rc', function(req, res) {
        // If found, redirect
 
        // Otherwise, make api calls
-       SteamApi.key = api.key;
+       SteamApi.key = apimeta.key;
        var user;
        SteamApi.ready(function(err) {
            if (err) return console.log(err);
