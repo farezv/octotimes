@@ -11,3 +11,11 @@ body {
 a {
   color: #00B7FF;
 }
+
+/* User view
+*/
+
+.avatar {
+    border: 2px solid mintcream;
+    border-radius: 25px;
+}
