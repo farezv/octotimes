@@ -5,6 +5,8 @@ var apimeta = require('../api');
 var SteamApi = require('steam-webapi');
 var User = require('../public/javascripts/user');
 var steamUser;
+var currentResponse;
+var currentRequest;
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -27,19 +29,11 @@ router.post('/rc', function(req, res) {
 
        // Otherwise, make api calls
        SteamApi.key = apimeta.key;
+       currentRequest = req;
+       currentResponse = res;
        var user;
-       SteamApi.ready(function(err) {
-           if (err) return console.log(err);
-           var steam = new SteamApi();
-           steam.resolveVanityURL({vanityurl:req.body.username}, function(err, result) {
-               if (err) {
-                   console.log(err);
-               } else {
-                   getPlayerProfile(result.steamid, res);
-               }
-           });
+       SteamApi.ready(getSteamIdFromApi);
 
-       });
 
        // Store it in cache
 
@@ -48,24 +42,40 @@ router.post('/rc', function(req, res) {
    }
 });
 
-function getPlayerProfile(steamId, res) {
+function getSteamIdFromApi(err) {
+    if (err) return console.log(err);
+    var steam = new SteamApi();
+    steam.resolveVanityURL({vanityurl:currentRequest.body.username}, function(err, result) {
+        if (err) {
+            console.log(err);
+        } else {
+            getPlayerProfile(result.steamid);
+        }
+    });
+}
+
+function getPlayerProfile(steamId) {
     var searchUrl = apimeta.getPlayerSummary + steamId;
     request({
         url: searchUrl,
         headers: {
             'User-Agent': 'farezv-steamrc'
         }
-    }, function(error, reqResponse, body) {
-        if(!error && reqResponse.statusCode == 200) {
-            var bodyJson = [];
-            bodyJson = JSON.parse(body);
-            var apiResponse = bodyJson.response;
-            var userJson = apiResponse.players[0];
+    }, getProfileFromApi);
+}
+
+function getProfileFromApi(error, reqResponse, body) {
+    if(!error && reqResponse.statusCode == 200) {
+        var bodyJson = [];
+        bodyJson = JSON.parse(body);
+        var apiResponse = bodyJson.response;
+        var userJson = apiResponse.players[0];
 //            console.log(userJson);
-            steamUser = new User(userJson.steamid, userJson.personaname, userJson.realname, userJson.profileurl, userJson.avatarfull);
-            res.redirect(steamUser.personaName);
+        steamUser = new User(userJson.steamid, userJson.personaname, userJson.realname, userJson.profileurl, userJson.avatarfull);
+        if (currentResponse != null) {
+            currentResponse.redirect(steamUser.personaName);
         }
-    });
+    }
 }
 
 module.exports = router;
