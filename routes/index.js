@@ -4,6 +4,9 @@ var request = require('request');
 var apimeta = require('../api');
 var SteamApi = require('steam-webapi');
 var User = require('../public/javascripts/user');
+var redis = require("redis"),
+    client = redis.createClient();
+
 var steamUser;
 var currentResponse;
 var currentRequest;
