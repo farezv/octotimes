@@ -75,17 +75,27 @@ function getProfileFromApi(error, reqResponse, body) {
     if(!error && reqResponse.statusCode == 200) {
         var bodyJson = [];
         bodyJson = JSON.parse(body);
-        var apiResponse = bodyJson.response;
-        var userJson = apiResponse.players[0];
-//            console.log(userJson);
-        steamUser = new User(userJson.steamid, userJson.personaname, userJson.realname, userJson.profileurl, userJson.avatarfull);
-        redirectToReport();
+        if(apiResponse != null) {
+            var apiResponse = bodyJson.response;
+            var userJson = apiResponse.players[0];
+        } else redirectToError();
+        console.log(apiResponse);
+        if(userJson != null) {
+            steamUser = new User(userJson.steamid, userJson.personaname, userJson.realname, userJson.profileurl, userJson.avatarfull);
+            redirectToReport();
+        }
     }
 }
 
 function redirectToReport() {
     if (currentResponse != null) {
         currentResponse.redirect(steamUser.personaName);
+    }
+}
+
+function redirectToError() {
+    if (currentResponse != null) {
+        currentResponse.render('error', {message: 'Whoops, something went wrong. The team is on it!' });
     }
 }
 
