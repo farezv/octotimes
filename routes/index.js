@@ -4,8 +4,8 @@ var request = require('request');
 var apimeta = require('../api');
 var SteamApi = require('steam-webapi');
 var User = require('../public/javascripts/user');
-var redis = require("redis"),
-    client = redis.createClient();
+var redis = require("redis");
+var client;
 
 var steamUser;
 var currentResponse;
@@ -13,6 +13,10 @@ var currentRequest;
 
 /* GET home page. */
 router.get('/', function(req, res) {
+    client = redis.createClient();
+    client.on('error', function(err) {
+        console.log('Error ' + err);
+    });
   res.render('index', { title: 'Steam Report Card' });
 });
 
@@ -75,9 +79,13 @@ function getProfileFromApi(error, reqResponse, body) {
         var userJson = apiResponse.players[0];
 //            console.log(userJson);
         steamUser = new User(userJson.steamid, userJson.personaname, userJson.realname, userJson.profileurl, userJson.avatarfull);
-        if (currentResponse != null) {
-            currentResponse.redirect(steamUser.personaName);
-        }
+        redirectToReport();
+    }
+}
+
+function redirectToReport() {
+    if (currentResponse != null) {
+        currentResponse.redirect(steamUser.personaName);
     }
 }
 
